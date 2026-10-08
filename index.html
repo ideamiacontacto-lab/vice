@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="avatar.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Boldonse&family=Yellowtail&family=Inter:wght@400;500;600;700&display=swap">
 <style>
   :root{
     --bg:#121210; --ink:#f3eee6; --soft:#bdb7ac; --muted:#7f7a71;
@@ -192,7 +192,7 @@
     .tag{font-size:9.5px; letter-spacing:.36em}
     .logo{width:min(46%, 180px); margin:8px 0 0}
     .open{margin-top:8px; font-size:11px; padding:6px 11px 5px}
-    .intro{margin:16px 0 14px}
+    .intro{margin:12px 0 10px}
     .intro h1{font-size:16px}
     .intro p{font-size:13px; margin-top:4px}
     nav{gap:9px}
@@ -200,8 +200,8 @@
     .ico{width:38px; height:38px; border-radius:10px}
     .ico svg{width:19px; height:19px}
     .txt b{font-size:15px} .txt small{font-size:12px; margin-top:1px}
-    .spacer{min-height:16px}
-    footer{padding-top:12px} .by{margin-top:8px}
+    .spacer{min-height:12px}
+    footer{padding-top:8px} .by{margin-top:6px} .info{margin-top:4px}
     .cal{margin-top:4px} .cal-h{margin-bottom:12px}
     .cal h2{font-size:16px; margin-top:4px} .cal-s{font-size:12.5px}
     .cg{padding:12px 8px 10px}
@@ -222,17 +222,53 @@
   .an-m i{width:5px; height:5px; border-radius:50%; background:var(--muted)}
   .an-m.hoy b{color:var(--cyan-hi)}
   .an-m.sel{color:var(--ink); border-color:var(--pink); background:rgba(233,71,128,.14); box-shadow:0 0 10px rgba(233,71,128,.3)}
-  .an-filtros{display:flex; flex-wrap:wrap; align-items:center; gap:6px; width:100%; margin-top:10px}
-  .an-sep{width:1px; height:18px; background:rgba(255,255,255,.14); margin:0 3px}
-  .an-f{display:inline-flex; align-items:center; gap:5px; padding:5px 9px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:transparent;
-    font:inherit; font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--muted); cursor:pointer; -webkit-tap-highlight-color:transparent}
-  .an-f i{width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.35}
-  .an-f.on{color:var(--ink); border-color:rgba(255,255,255,.3)} .an-f.on i{opacity:1}
-  .an-f.n1.on i, i.n1{background:var(--pink-hi)!important; box-shadow:0 0 5px rgba(233,71,128,.8)}
-  .an-f.n2.on i, i.n2{background:var(--cyan-hi)!important; box-shadow:0 0 5px rgba(43,184,209,.8)}
-  .an-f.n3.on i, i.n3{background:#ffd28a!important}
-  .an-f.n4.on i, i.n4{background:#8f8a81!important}
-  .an-lista{width:100%; margin-top:10px; max-height:calc(100svh - 552px); min-height:180px; overflow-y:auto; overscroll-behavior:contain; padding-right:2px}
+  .an-filtros{width:100%; margin-top:10px; display:flex; flex-direction:column; gap:8px; --n1:var(--pink-hi); --n2:var(--cyan-hi); --n3:#ffd28a; --n4:#8f8a81}
+  /* escala de niveles: control segmentado con indicador que se desliza */
+  .an-escala{position:relative; display:grid; grid-template-columns:1.15fr repeat(4, 1fr); padding:4px; border-radius:16px;
+    background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.09)}
+  .an-ind{position:absolute; left:0; top:4px; bottom:4px; border-radius:12px; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.14);
+    transition:transform .38s cubic-bezier(.2,.8,.2,1), width .38s cubic-bezier(.2,.8,.2,1), background .3s, box-shadow .3s; pointer-events:none}
+  .an-ind.n1{background:rgba(233,71,128,.16); border-color:rgba(233,71,128,.55); box-shadow:0 0 16px rgba(233,71,128,.35)}
+  .an-ind.n2{background:rgba(43,184,209,.14); border-color:rgba(43,184,209,.55); box-shadow:0 0 16px rgba(43,184,209,.3)}
+  .an-ind.n3{background:rgba(255,210,138,.12); border-color:rgba(255,210,138,.5); box-shadow:0 0 14px rgba(255,210,138,.22)}
+  .an-ind.n4{background:rgba(143,138,129,.16); border-color:rgba(143,138,129,.5)}
+  .an-e{position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; height:40px; border:0; background:transparent;
+    font:inherit; font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); cursor:pointer;
+    -webkit-tap-highlight-color:transparent; transition:color .25s, transform .12s}
+  .an-e:active{transform:scale(.94)}
+  .an-e.on{color:var(--ink)}
+  /* barras de intensidad (nivel 1 = cuatro llenas) */
+  .bars{display:inline-flex; align-items:flex-end; gap:2px; height:12px}
+  .bars i{display:block; width:3px; border-radius:1px; background:rgba(255,255,255,.16); transition:background .3s, box-shadow .3s}
+  .bars i:nth-child(1){height:4px} .bars i:nth-child(2){height:6.5px} .bars i:nth-child(3){height:9px} .bars i:nth-child(4){height:12px}
+  .bars.n1 i.f{background:var(--n1)} .bars.n2 i.f{background:var(--n2)} .bars.n3 i.f{background:var(--n3)} .bars.n4 i.f{background:var(--n4)}
+  .an-e:not(.on) .bars i.f{opacity:.55}
+  .an-e.on .bars.n1 i.f{box-shadow:0 0 6px var(--n1)} .an-e.on .bars.n2 i.f{box-shadow:0 0 6px var(--n2)}
+  /* qué significa el nivel elegido */
+  .an-def{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; text-align:left; padding:2px 4px}
+  .an-def .bars{height:22px; gap:3px} .an-def .bars i{width:5px} .an-def .bars i:nth-child(1){height:7px} .an-def .bars i:nth-child(2){height:12px} .an-def .bars i:nth-child(3){height:17px} .an-def .bars i:nth-child(4){height:22px}
+  .bars-todos{display:grid; grid-template-columns:repeat(2, auto); gap:3px 6px}
+  .bars-todos .bars{height:12px; gap:2px} .bars-todos .bars i{width:3px}
+  .bars-todos .bars i:nth-child(1){height:4px} .bars-todos .bars i:nth-child(2){height:6.5px} .bars-todos .bars i:nth-child(3){height:9px} .bars-todos .bars i:nth-child(4){height:12px}
+  .an-def div{display:flex; flex-direction:column; gap:2px; min-width:0}
+  .an-def b{font-size:13px; color:var(--ink); letter-spacing:.01em}
+  .an-def span{font-size:12px; color:var(--soft); line-height:1.4}
+  .an-def em{font-style:normal; font-size:11.5px; font-weight:600; line-height:1.35}
+  .an-def.n1 em{color:var(--n1)} .an-def.n2 em{color:var(--n2)} .an-def.n3 em{color:var(--n3)} .an-def.n4 em{color:var(--soft)}
+  .an-def.in{animation:an-def .4s cubic-bezier(.2,.8,.2,1)}
+  @keyframes an-def{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+  i.n1{background:var(--pink-hi)!important; box-shadow:0 0 5px rgba(233,71,128,.8)}
+  i.n2{background:var(--cyan-hi)!important; box-shadow:0 0 5px rgba(43,184,209,.8)}
+  i.n3{background:#ffd28a!important}
+  i.n4{background:#8f8a81!important}
+  /* grupos y tarjetas por nivel */
+  .an-g{display:flex; align-items:center; gap:8px; margin:12px 2px 7px; font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); --n1:var(--pink-hi); --n2:var(--cyan-hi); --n3:#ffd28a; --n4:#8f8a81}
+  .an-g::after{content:""; flex:1; height:1px; background:rgba(255,255,255,.08)}
+  .an-c.n1{box-shadow:inset 2px 0 0 var(--pink-hi)} .an-c.n2{box-shadow:inset 2px 0 0 var(--cyan-hi)} .an-c.n3{box-shadow:inset 2px 0 0 #ffd28a} .an-c.n4{box-shadow:inset 2px 0 0 #8f8a81}
+  .an-lista.anim .an-c, .an-lista.anim .an-g{animation:an-in .45s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i, 0) * 45ms)}
+  @keyframes an-in{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+  .an-tags em.sug{color:var(--ink); border-style:dashed; border-color:rgba(255,255,255,.35)}
+  .an-lista{width:100%; margin-top:10px; max-height:calc(100svh - 560px); min-height:140px; overflow-y:auto; overscroll-behavior:contain; padding-right:2px}
   .an-t{font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--pink-hi); margin:2px 2px 8px; display:flex; align-items:center; gap:10px}
   .an-t span{color:var(--muted)} .an-t::after{content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(233,71,128,.5), transparent)}
   .an-fijo{display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; padding:9px 12px; margin-bottom:8px; border-radius:12px;
@@ -252,6 +288,33 @@
   .an-tags em.n3{color:#ffd28a; border-color:rgba(255,190,90,.5)} .an-tags em.n4{color:var(--muted)}
   .an-desc{font-size:13.5px; line-height:1.45; color:var(--soft); margin-top:4px}
   .an-cuando{font-size:12px; font-weight:600; color:var(--cyan-hi); margin-top:2px}
+  /* burger del mes (la carga el cliente) */
+  .bm-vacia{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; width:100%; text-align:left; font:inherit; color:var(--ink); cursor:pointer;
+    padding:11px 12px; margin-bottom:8px; border-radius:12px; border:1px dashed rgba(233,71,128,.7); background:rgba(233,71,128,.07); -webkit-tap-highlight-color:transparent}
+  .bm-vacia i,.bm-k i{width:7px; height:7px; border-radius:50%; display:inline-block}
+  .bm-vacia b{display:block; font-size:13.5px} .bm-vacia small{display:block; font-size:12px; color:var(--soft); line-height:1.35; margin-top:2px}
+  .bm-vacia em{font-style:normal; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--pink); color:#181816; font-weight:700; font-size:18px}
+  .bm-ok,.bm-form{padding:11px 12px; margin-bottom:8px; border-radius:12px; border:1px solid rgba(233,71,128,.55); background:rgba(233,71,128,.07); display:flex; flex-direction:column; gap:6px}
+  .bm-k{display:flex; align-items:center; gap:7px; font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--pink-hi)}
+  .bm-t{font-size:14px; line-height:1.4; color:var(--soft)} .bm-t b{color:var(--ink)}
+  .bm-i{font-size:12.5px; color:var(--soft); line-height:1.4} .bm-n{font-size:12px; color:var(--muted); line-height:1.4}
+  .bm-ed{align-self:flex-start; font:inherit; font-size:11.5px; font-weight:700; color:var(--pink-hi); background:transparent; border:0; padding:2px 0; cursor:pointer}
+  .bm-form label{display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--soft)}
+  .bm-form input,.bm-form textarea{font:inherit; font-size:16px; font-weight:400; letter-spacing:0; color:var(--ink); background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.16);
+    border-radius:10px; padding:7px 10px; outline:none; resize:none; color-scheme:dark}
+  .bm-form input:focus,.bm-form textarea:focus{border-color:var(--pink)}
+  .bm-pie{display:flex; align-items:center; gap:8px; margin-top:2px}
+  .bm-est{flex:1; font-size:11.5px; color:var(--muted)} .bm-est.err{color:#ff8a8a}
+  .bm-pie button{font:inherit; font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; border-radius:999px; padding:8px 14px; cursor:pointer; border:0}
+  .bm-pie button[type=submit]{background:var(--pink); color:#181816} .bm-pie .bm-x{background:transparent; color:var(--soft)}
+  .bm-pie button:disabled{opacity:.5}
+  .bm-preg{padding:11px 12px; margin-bottom:8px; border-radius:12px; border:1px dashed rgba(233,71,128,.7); background:rgba(233,71,128,.07); display:flex; flex-direction:column; gap:8px}
+  .bm-q{font-size:14.5px; font-weight:700; color:var(--ink)}
+  .bm-sn{display:flex; gap:8px}
+  .bm-sn button{flex:1; font:inherit; font-size:12px; font-weight:700; letter-spacing:.06em; padding:9px 10px; border-radius:999px; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  .bm-si{background:var(--pink); color:#181816; border:0; box-shadow:0 0 12px rgba(233,71,128,.45)}
+  .bm-nono{background:transparent; color:var(--soft); border:1px solid rgba(255,255,255,.2)}
+  .bm-no{border-color:rgba(255,255,255,.14); background:rgba(255,255,255,.03)}
   /* hoja de detalle */
   .hoja{position:fixed; inset:0; z-index:20; background:rgba(8,8,7,.6); backdrop-filter:blur(3px); display:flex; align-items:flex-end; justify-content:center;
     opacity:0; transition:opacity .25s}
@@ -318,7 +381,11 @@
   .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
   .spacer{flex:1; min-height:28px}
   footer{width:100%; text-align:center; padding-top:18px; border-top:1px solid rgba(255,255,255,.08)}
-  .slogan{font-size:13px; font-weight:600; color:var(--ink); letter-spacing:.01em}
+  .slogan{display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1}
+  .slogan .s1{font-family:Boldonse, Impact, sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); line-height:1.6}
+  .slogan .s2{display:flex; align-items:baseline; gap:6px; font-family:Boldonse, Impact, sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--pink-hi); line-height:1.6}
+  .slogan .s2 b{font-family:Yellowtail, cursive; font-weight:400; font-size:26px; letter-spacing:0; text-transform:none; color:#ffd1e1; line-height:1;
+    text-shadow:0 0 4px #ff6fa3, 0 0 12px #e94780, 0 0 26px rgba(233,71,128,.7); animation:flicker 7s infinite}
   .info{margin-top:6px; font-size:12px; color:var(--muted); line-height:1.6}
   .by{margin-top:14px; font-size:10.5px; font-weight:700; letter-spacing:.32em; text-transform:uppercase; color:var(--muted)}
 
@@ -398,17 +465,16 @@
       <div class="cal-h">
         <p class="cal-k"><span class="dot"></span>Calendario anual</p>
         <h2>Las fechas del año</h2>
-        <p class="cal-s">Elegí un mes. Tocá una fecha para ver la idea y cuándo arrancar.</p>
       </div>
       <div class="an-meses" id="an-meses"></div>
       <div class="an-filtros" id="an-filtros"></div>
       <div class="an-lista" id="an-lista"></div>
-      <p class="cal-pie">N1 campañas mayores · N2 especiales · N3 bajas · N4 mención</p>
+      <p class="cal-pie">Las marcadas como “Sugerencia” son ideas de Ideamia, a validar.</p>
     </section>
 
     <div class="spacer"></div>
     <footer>
-      <p class="slogan">No inventamos nada, lo hicimos bien.</p>
+      <p class="slogan"><span class="s1">No inventamos nada,</span><span class="s2">lo hicimos <b>Bien</b></span></p>
       <p class="info">Irigoyen 301 · Martes a domingo desde las 20</p>
       <p class="by">Ideamia estudio</p>
     </footer>
@@ -441,8 +507,8 @@
   ir(location.hash.slice(1), true);
 })();
 </script>
-<script src="anual.js?v=1"></script>
-<script src="anual-ui.js?v=1" defer></script>
+<script src="anual.js?v=2"></script>
+<script src="anual-ui.js?v=5" defer></script>
 <script src="calendario.js?v=10" defer></script>
 </body>
 </html>
