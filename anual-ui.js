@@ -25,7 +25,7 @@
     meses.innerHTML = MES.map((n, i) => {
       const m = i + 1, fs = D.fechas.filter(f => f.m === m && pasa(f));
       const pts = fs.slice(0, 4).map(f => '<i class="n' + f.nivel + '"></i>').join('');
-      return '<button class="an-m' + (m === MES_SEL ? ' sel' : '') + (m === hoy.getMonth() + 1 ? ' hoy' : '') + '" data-m="' + m + '" aria-pressed="' + (m === MES_SEL) + '"><b>' + n + '</b><span>' + pts + '</span></button>';
+      const y = anioDe(m); return '<button class="an-m' + (m === MES_SEL ? ' sel' : '') + (m === hoy.getMonth() + 1 ? ' hoy' : '') + '" data-m="' + m + '" aria-pressed="' + (m === MES_SEL) + '"><b>' + n + '</b><small>' + String(y).slice(2) + '</small><span>' + pts + '</span></button>';
     }).join('');
   }
   function pintarFiltros() {

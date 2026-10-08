@@ -213,9 +213,11 @@
   /* calendario anual */
   .anual{margin-top:4px}
   .an-meses{display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; width:100%}
-  .an-m{display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 0 7px; border-radius:11px; border:1px solid rgba(255,255,255,.1);
+  .an-m{display:flex; flex-direction:column; align-items:center; gap:4px; padding:7px 0 6px; border-radius:11px; border:1px solid rgba(255,255,255,.1);
     background:rgba(255,255,255,.03); font:inherit; color:var(--soft); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .15s, background .15s}
   .an-m b{font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase}
+  .an-m small{font-size:9px; letter-spacing:.08em; color:var(--muted); margin-top:-3px}
+  .an-m.sel small{color:var(--pink-hi)}
   .an-m span{display:flex; gap:3px; height:5px}
   .an-m i{width:5px; height:5px; border-radius:50%; background:var(--muted)}
   .an-m.hoy b{color:var(--cyan-hi)}
