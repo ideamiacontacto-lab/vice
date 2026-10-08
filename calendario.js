@@ -2,7 +2,7 @@
    a través del Apps Script del Panel Ideamia (action=cliente). Solo lectura. */
 (function () {
   const API = 'https://script.google.com/macros/s/AKfycbwCxld4KNBsNMSGGluIA138f1vaKBo2TnqMIXsO2Y8iV87k4d7NUic47-MpvEgYehZJ/exec';
-  const MARCA = 'vice-burger', DIAS = 15, TZ = 'America/Argentina/Cordoba', VISIBLES = 4;
+  const MARCA = 'vice-burger', DIAS = 15, TZ = 'America/Argentina/Cordoba', VISIBLES = 99;
   const $ = s => document.querySelector(s);
   const box = $('#cal-lista'), estado = $('#cal-estado');
   if (!box) return;
@@ -72,12 +72,14 @@
         const urls = l.match(/https?:\/\/\S+/g) || [];
         const tipo = /^\s*(video|reel)\b/i.test(l) ? 'Ver video' : /^\s*(foto|imagen)\b/i.test(l) ? 'Ver foto' : 'Ver archivo';
         let t = l.replace(/https?:\/\/\S+/g, '').replace(/\s{2,}/g, ' ').replace(/[:·-]\s*$/, '').trim();
+        if (urls.length && tipo !== 'Ver archivo') t = t.replace(/\([^)]*\)/g, '').trim(); // notas de edición ("cortar principio…"): son internas
         if (/^(foto|video|imagen|reel)$/i.test(t)) t = '';
         t = esc(t.replace(/^(foto|video|imagen)\s*:\s*/i, ''));
         let media = '';
         urls.forEach(u => {
           const id = driveId(u);
-          if (id) media += '<a class="foto" href="' + esc(u) + '" target="_blank" rel="noopener"><img loading="lazy" src="https://drive.google.com/thumbnail?id=' + id + '&sz=w600" alt="" onerror="this.remove()"><span>' + tipo + ' ↗</span></a>';
+          if (id && tipo === 'Ver video') media += dvid(id, u);
+          else if (id) media += '<a class="foto" href="' + esc(u) + '" target="_blank" rel="noopener"><img loading="lazy" src="https://lh3.googleusercontent.com/d/' + id + '=w800" data-id="' + id + '" alt="" onerror="__fotoErr(this)"><span>' + tipo + ' ↗</span></a>';
           else media += ' <a class="lnk" href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(u.replace(/^https?:\/\/(www\.)?/, '').split(/[/?]/)[0]) + ' ↗</a>';
         });
         if (/^cm\s*:/i.test(l)) t = '<span class="nota">Sticker con enlace: ' + t.replace(/^cm\s*:\s*/i, '') + '</span>';
@@ -86,15 +88,31 @@
       return '<div class="bloque">' + (titulo ? '<h5>' + esc(titulo) + '</h5>' : '') + html + '</div>';
     }).join('');
   }
+  /* fotos de Drive: lh3 → miniatura de Drive → botón que abre la vista previa de Drive ahí mismo */
+  window.__fotoErr = img => {
+    if (!img.dataset.paso) { img.dataset.paso = 1; img.src = 'https://drive.google.com/thumbnail?id=' + img.dataset.id + '&sz=w800'; return; }
+    const a = img.closest('a.foto'); if (!a) return img.remove();
+    const d = document.createElement('div'); d.className = 'dvid';
+    d.innerHTML = '<button class="dplay foto-p" data-drive="' + esc(img.dataset.id) + '" aria-label="Ver foto"><span class="pl">◉</span></button>';
+    a.parentNode.insertBefore(d, a); img.remove();
+  };
+  /* video de Drive: miniatura con ▶; al tocarla se carga el reproductor de Drive ahí mismo */
+  function dvid(id, u) {
+    return '<div class="dvid"><button class="dplay" data-drive="' + esc(id) + '" aria-label="Reproducir video"><img loading="lazy" src="https://lh3.googleusercontent.com/d/' + id + '=w800" data-id="' + id + '" alt="" onerror="__fotoErr(this)"><span class="pl">▶</span></button>'
+      + '<a class="dlink" href="' + esc(u) + '" target="_blank" rel="noopener">Abrir en Drive ↗</a></div>';
+  }
+  /* piezas finales: diseños (imágenes) y videos subidos a Trello (por el puente) o links de Drive / Canva */
   function archivosHtml(arr) {
     const vis = (arr || []).filter(a => a.src || /drive\.google|canva\.com|figma\.com/.test(a.u || ''));
     if (!vis.length) return '';
-    return '<h4>Piezas</h4><div class="arch">' + vis.map(a => {
-      if (a.src && a.video) return '<video src="' + esc(a.src) + '" controls playsinline preload="metadata"></video>';
+    const imgs = vis.filter(a => a.src && a.img).length;
+    return '<h4>Diseño y video</h4><div class="arch' + (imgs > 1 ? ' dos' : '') + '">' + vis.map(a => {
+      if (a.src && a.video) return '<video class="ancho" src="' + esc(a.src) + '" controls playsinline preload="metadata"></video>';
       if (a.src && a.img) return '<a href="' + esc(a.src) + '" target="_blank" rel="noopener"><img loading="lazy" src="' + esc(a.src) + '" alt="' + esc(a.n) + '"></a>';
       const id = driveId(a.u);
-      if (id) return '<a class="foto" href="' + esc(a.u) + '" target="_blank" rel="noopener"><img loading="lazy" src="https://drive.google.com/thumbnail?id=' + id + '&sz=w600" alt="" onerror="this.remove()"><span>' + esc(a.n || 'Ver archivo') + ' ↗</span></a>';
-      return '<a class="lnk" href="' + esc(a.u) + '" target="_blank" rel="noopener">' + esc(a.n || 'Ver pieza') + ' ↗</a>';
+      if (id && (a.video || /\.(mp4|mov|webm)$/i.test(a.n || ''))) return '<div class="ancho">' + dvid(id, a.u) + '</div>';
+      if (id) return '<a class="foto" href="' + esc(a.u) + '" target="_blank" rel="noopener"><img loading="lazy" src="https://lh3.googleusercontent.com/d/' + id + '=w800" data-id="' + id + '" alt="" onerror="__fotoErr(this)"><span>' + esc(a.n || 'Ver archivo') + ' ↗</span></a>';
+      return '<a class="lnk ancho" href="' + esc(a.u) + '" target="_blank" rel="noopener">' + esc(a.n || 'Ver pieza') + ' ↗</a>';
     }).join('') + '</div>';
   }
 
@@ -146,7 +164,11 @@
     hojaIn.querySelector('.cerrar').focus({ preventScroll: true });
   }
   function cerrar() { hoja.classList.remove('on'); document.body.style.overflow = ''; setTimeout(() => { hoja.hidden = true; }, 250); }
-  hoja.addEventListener('click', e => { if (e.target === hoja || e.target.closest('.cerrar')) cerrar(); });
+  hoja.addEventListener('click', e => {
+    if (e.target === hoja || e.target.closest('.cerrar')) return cerrar();
+    const p = e.target.closest('.dplay');
+    if (p) p.outerHTML = '<iframe class="dframe" src="https://drive.google.com/file/d/' + encodeURIComponent(p.dataset.drive) + '/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>';
+  });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !hoja.hidden) cerrar(); });
 
   /* ---------- datos ---------- */

@@ -100,7 +100,7 @@
   .link:hover .go{transform:translateX(3px); color:var(--ink)}
 
   /* calendario provisorio */
-  .cal{width:100%; margin-top:30px; opacity:0; animation:rise .55s ease .6s forwards}
+  .cal{width:100%; margin-top:22px}
   .cal-h{text-align:center; margin-bottom:16px}
   .cal-k{display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:.32em; text-transform:uppercase;
     color:var(--cyan-hi); text-shadow:0 0 8px rgba(43,184,209,.8)}
@@ -160,11 +160,42 @@
   .foto img{display:block; width:100%; max-height:340px; object-fit:cover; background:#222}
   .foto span{display:block; padding:7px 10px; font-size:12px}
   .lnk{display:inline-block; margin-top:6px; font-size:13px; color:var(--cyan-hi)}
-  .arch{display:grid; grid-template-columns:1fr 1fr; gap:8px}
-  .arch img,.arch video{display:block; width:100%; border-radius:10px; background:#222}
+  .arch{display:grid; grid-template-columns:1fr; gap:8px}
+  .arch.dos{grid-template-columns:1fr 1fr}
+  .arch .ancho{grid-column:1 / -1}
+  .arch img,.arch video{display:block; width:100%; border-radius:12px; background:#222}
+  .arch video{max-height:70svh; background:#000}
   .arch .foto{margin-top:0}
+  .dvid{margin-top:8px}
+  .dplay{position:relative; display:block; width:100%; aspect-ratio:9/12; max-height:420px; border:1px solid rgba(255,255,255,.14); border-radius:12px; overflow:hidden;
+    background:#0d0d0c; cursor:pointer; padding:0}
+  .dplay img{width:100%; height:100%; object-fit:cover; opacity:.75}
+  .pl{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:62px; height:62px; border-radius:50%; display:grid; place-items:center;
+    font-size:22px; color:var(--ink); background:rgba(233,71,128,.9); box-shadow:0 0 24px rgba(233,71,128,.8); padding-left:4px}
+  .foto-p{aspect-ratio:4/5}
+  .dframe{display:block; width:100%; aspect-ratio:9/14; max-height:72svh; border:0; border-radius:12px; background:#000}
+  .dlink{display:inline-block; margin-top:6px; font-size:12.5px; color:var(--cyan-hi)}
   .trello{display:block; margin-top:22px; padding:13px; text-align:center; border-radius:12px; font-size:14px; font-weight:600; text-decoration:none;
     color:var(--ink); border:1.5px solid rgba(43,184,209,.7); box-shadow:0 0 12px rgba(43,184,209,.2)}
+  /* pestañas (barra de arriba): Recursos · Calendario */
+  .tabs-wrap{position:sticky; top:0; z-index:10; width:100%; display:flex; justify-content:center; padding-top:40px; margin:-34px 0 22px;
+    background:linear-gradient(to bottom, rgba(18,18,16,.97) 72%, rgba(18,18,16,0)); border-radius:22px 22px 0 0}
+  .tabs{display:flex; gap:6px; padding:8px; border-radius:999px; background:var(--ink);
+    box-shadow:0 0 0 2px var(--pink), 0 0 22px rgba(233,71,128,.55), 0 10px 30px rgba(0,0,0,.45)}
+  .tab{position:relative; width:76px; height:48px; border:0; border-radius:999px; background:transparent; cursor:pointer; display:grid; place-items:center;
+    color:#3b3833; transition:background .2s, color .2s; -webkit-tap-highlight-color:transparent}
+  .tab svg{width:25px; height:25px}
+  .tab:hover{color:#181816}
+  .tab[aria-selected="true"]{color:var(--pink); background:rgba(233,71,128,.12)}
+  .tab .bub{position:absolute; bottom:calc(100% + 14px); left:50%; transform:translate(-50%, 6px); white-space:nowrap; pointer-events:none;
+    font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#181816; background:var(--ink);
+    padding:7px 12px 7px 14px; border-radius:999px; box-shadow:0 0 14px rgba(233,71,128,.5); opacity:0; transition:opacity .2s, transform .2s}
+  .tab .bub::after{content:""; position:absolute; top:100%; left:50%; margin-left:-6px; border:6px solid transparent; border-top-color:var(--ink)}
+  .tab[aria-selected="true"] .bub{opacity:1; transform:translate(-50%, 0)}
+  .tab:focus-visible{outline:2px solid var(--cyan); outline-offset:2px}
+  .panel{width:100%; display:flex; flex-direction:column; align-items:center}
+  .panel[hidden], .hoja[hidden]{display:none}
+  .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
   .spacer{flex:1; min-height:28px}
   footer{width:100%; text-align:center; padding-top:18px; border-top:1px solid rgba(255,255,255,.08)}
   .slogan{font-size:13px; font-weight:600; color:var(--ink); letter-spacing:.01em}
@@ -185,10 +216,26 @@
 <div class="floor"></div>
 <main class="wrap">
   <div class="frame"><div class="frame-in">
+    <div class="tabs-wrap">
+      <div class="tabs" role="tablist" aria-label="Secciones">
+        <button class="tab" role="tab" id="t-recursos" aria-controls="p-recursos" aria-selected="true" data-tab="recursos">
+          <span class="bub">Recursos</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7v7.8A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M3 10.5h18"/></svg>
+          <span class="sr">Recursos</span>
+        </button>
+        <button class="tab" role="tab" id="t-calendario" aria-controls="p-calendario" aria-selected="false" data-tab="calendario">
+          <span class="bub">Calendario</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="9" cy="14" r="1.2" fill="currentColor"/><circle cx="15" cy="14" r="1.2" fill="currentColor"/></svg>
+          <span class="sr">Calendario</span>
+        </button>
+      </div>
+    </div>
+
     <p class="tag">Paraná · desde 2026</p>
     <img class="logo" src="logo.png" alt="Vice Burgers &amp; Fries" width="640" height="220">
     <span class="open"><span class="dot"></span>ABIERTO DE NOCHE</span>
 
+    <section class="panel" id="p-recursos" role="tabpanel" aria-labelledby="t-recursos">
     <div class="intro">
       <h1>Todo lo de la <span>marca</span>, en un lugar.</h1>
       <p>Archivos, calendario y estrategia.</p>
@@ -216,12 +263,13 @@
         <span class="go" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
       </a>
     </nav>
+    </section>
 
-    <section class="cal" id="calendario" aria-labelledby="cal-t">
+    <section class="panel cal" id="p-calendario" role="tabpanel" aria-labelledby="t-calendario" hidden>
       <div class="cal-h">
         <p class="cal-k"><span class="dot"></span>Calendario provisorio</p>
         <h2 id="cal-t">Lo que se viene</h2>
-        <p class="cal-s">Próximos 15 días. Tocá una publicación para ver el contenido y en qué estado está.</p>
+        <p class="cal-s">Próximos 15 días. Tocá una publicación para ver el diseño, el video y el copy, y en qué estado está.</p>
       </div>
       <div id="cal-lista" aria-live="polite"><p class="vacio">Cargando el calendario…</p></div>
       <p class="cal-pie" id="cal-estado"></p>
@@ -236,6 +284,31 @@
   </div></div>
 </main>
 <div class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-label="Detalle de la publicación"><div class="hoja-in" id="hoja-in"></div></div>
-<script src="calendario.js?v=2" defer></script>
+<script>
+/* pestañas: Recursos (por defecto) y Calendario (#calendario) */
+(function () {
+  const tabs = [...document.querySelectorAll('.tab')];
+  function ir(nombre, desdeHash) {
+    if (['recursos', 'calendario'].indexOf(nombre) < 0) nombre = 'recursos';
+    tabs.forEach(t => {
+      const on = t.dataset.tab === nombre;
+      t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (!desdeHash) history.replaceState(null, '', nombre === 'recursos' ? location.pathname + location.search : '#' + nombre);
+  }
+  tabs.forEach(t => {
+    t.addEventListener('click', () => { ir(t.dataset.tab); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    t.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const i = (tabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+      tabs[i].focus(); ir(tabs[i].dataset.tab);
+    });
+  });
+  window.addEventListener('hashchange', () => ir(location.hash.slice(1), true));
+  ir(location.hash.slice(1), true);
+})();
+</script>
+<script src="calendario.js?v=5" defer></script>
 </body>
 </html>
