@@ -150,14 +150,51 @@
       const it = ITEMS[i], r = resumen(it);
       return '<button class="item" data-i="' + i + '"><span class="item-h"><span class="fmt">' + esc(it.formato) + '</span><span class="hr">' + hora(it.salida) + ' h</span></span>'
         + '<b>' + esc(it.n) + '</b>' + (r ? '<small>' + esc(r) + '</small>' : '')
-        + '<span class="sts">' + it.partes.map(chip).join('') + '</span></button>';
+        + '<span class="sts">' + it.partes.map(chip).join('') + ((it.comentarios || []).length ? '<span class="st com">💬 ' + it.comentarios.length + '</span>' : '') + '</span></button>';
     }).join('') : '<p class="vacio">No hay nada programado para este día.</p>';
     box.innerHTML = html + '</div>';
   }
   box.addEventListener('click', e => {
-    const d = e.target.closest('.cg-d[data-d]'); if (d) { SEL = d.dataset.d; pintar(); return; }
+    const d = e.target.closest('.cg-d[data-d]');
+    if (d) { // al elegir un día, si lo de ese día quedó fuera de pantalla, se acerca solo
+      SEL = d.dataset.d; pintar();
+      const lista = box.querySelector('.dia'); if (lista && lista.getBoundingClientRect().top > innerHeight - 160) lista.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     const b = e.target.closest('.item'); if (b) ver(+b.dataset.i);
   });
+
+  /* ---------- comentarios: el cliente escribe, queda en la tarjeta de Trello; el equipo responde con "Para el cliente: …" ---------- */
+  const guardado = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
+  const msgHtml = m => '<div class="msg ' + (m.de === 'equipo' ? 'eq' : 'cl') + '"><p class="msg-q">' + esc(m.q) + ' · ' + esc(dm(m.f)) + ' ' + hora(m.f) + ' h</p><p>' + esc(m.t).replace(/\n/g, '<br>') + '</p></div>';
+  function comentariosHtml(it, i) {
+    const hilo = (it.comentarios || []).map(msgHtml).join('');
+    return '<h4>Comentarios</h4><div class="hilo">' + (hilo || '<p class="hilo-vacio">¿Algo para cambiar o sumar? Dejanos un comentario y le llega al equipo.</p>') + '</div>'
+      + '<form class="coment" data-i="' + i + '">'
+      + '<input class="c-nombre" name="nombre" maxlength="40" autocomplete="name" placeholder="Tu nombre" value="' + esc(guardado('vice:nombre')) + '">'
+      + '<textarea name="texto" rows="3" maxlength="1500" placeholder="Escribí tu comentario…" required></textarea>'
+      + '<div class="c-pie"><p class="c-estado" role="status"></p><button type="submit">Enviar</button></div></form>';
+  }
+  async function enviar(f) {
+    const it = ITEMS[+f.dataset.i], est = f.querySelector('.c-estado'), btn = f.querySelector('button');
+    const nombre = f.nombre.value.trim(), texto = f.texto.value.trim();
+    if (!texto) { f.texto.focus(); return; }
+    try { localStorage.setItem('vice:nombre', nombre); } catch (e) {}
+    btn.disabled = true; est.className = 'c-estado'; est.textContent = 'Enviando…';
+    try {
+      const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'comentarCliente', marca: MARCA, cardId: it.id, nombre: nombre, texto: texto }) }).then(x => x.json());
+      if (!r.ok) throw new Error(r.mensaje || 'No se pudo enviar');
+      const m = { de: 'cliente', q: nombre || 'Cliente', t: texto, f: new Date().toISOString() };
+      (it.comentarios = it.comentarios || []).push(m);
+      const hilo = f.previousElementSibling, vacio = hilo.querySelector('.hilo-vacio');
+      if (vacio) vacio.remove();
+      hilo.insertAdjacentHTML('beforeend', msgHtml(m));
+      f.texto.value = ''; est.className = 'c-estado ok'; est.textContent = '✓ Listo, el equipo ya lo ve.';
+      pintar();
+    } catch (e) { est.className = 'c-estado err'; est.textContent = e.message || 'No se pudo enviar. Probá de nuevo.'; }
+    btn.disabled = false;
+  }
 
   /* ---------- detalle (hoja que sube desde abajo) ---------- */
   const hoja = $('#hoja'), hojaIn = $('#hoja-in');
@@ -169,6 +206,7 @@
       + '<div class="estado-box">' + (r ? '<p class="lead">' + esc(r) + '</p>' : '') + '<ul>' + it.partes.map(p => '<li class="' + (p.estado === 'listo' ? 'ok' : p.estado === 'revision' ? 'rev' : 'pen') + '">' + esc(frase(p)) + '</li>').join('') + '</ul></div>'
       + archivosHtml(it.archivos)
       + (c ? '<h4>' + (it.formato === 'Reel' ? 'Idea y guion' : 'Copy') + '</h4><div class="copy">' + c + '</div>' : '<p class="vacio">Todavía no tiene copy cargado.</p>')
+      + comentariosHtml(it, i)
       + '<a class="trello" href="' + esc(it.url) + '" target="_blank" rel="noopener">Ver la tarjeta en Trello ↗</a>';
     hoja.hidden = false; requestAnimationFrame(() => hoja.classList.add('on'));
     document.body.style.overflow = 'hidden'; hojaIn.scrollTop = 0;
@@ -180,6 +218,7 @@
     const p = e.target.closest('.dplay');
     if (p) p.outerHTML = '<iframe class="dframe" src="https://drive.google.com/file/d/' + encodeURIComponent(p.dataset.drive) + '/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>';
   });
+  hoja.addEventListener('submit', e => { const f = e.target.closest('.coment'); if (f) { e.preventDefault(); enviar(f); } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !hoja.hidden) cerrar(); });
 
   /* ---------- datos ---------- */
