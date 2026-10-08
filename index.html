@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vice Burgers &amp; Fries · Links de la marca</title>
+<meta name="description" content="Accesos de Vice Burgers & Fries: Drive, calendario y análisis inicial.">
+<meta name="theme-color" content="#121210">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Vice Burgers & Fries">
+<meta property="og:description" content="Drive, calendario y análisis inicial de la marca.">
+<link rel="icon" type="image/png" href="avatar.png">
+<link rel="apple-touch-icon" href="avatar.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#121210; --ink:#f3eee6; --soft:#bdb7ac; --muted:#7f7a71;
+    --pink:#e94780; --pink-hi:#ff6fa3; --cyan:#2bb8d1; --cyan-hi:#6fe3f5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  /* noche: resplandores de neón de fondo */
+  .sky{position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(60vmax 40vmax at 15% -5%, rgba(233,71,128,.28), transparent 60%),
+      radial-gradient(55vmax 40vmax at 100% 105%, rgba(43,184,209,.22), transparent 60%),
+      radial-gradient(40vmax 30vmax at 50% 50%, rgba(233,71,128,.06), transparent 70%);
+  }
+  .sky::after{content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+    mix-blend-mode:overlay;}
+  /* piso de grilla, guiño 80s, muy sutil */
+  .floor{position:fixed; left:-25%; right:-25%; bottom:-6vh; height:38vh; z-index:0; pointer-events:none;
+    background:
+      linear-gradient(to top, rgba(18,18,16,0) 0%, var(--bg) 92%),
+      repeating-linear-gradient(90deg, rgba(43,184,209,.22) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, rgba(43,184,209,.22) 0 1px, transparent 1px 48px);
+    transform:perspective(420px) rotateX(62deg); transform-origin:bottom; opacity:.55;}
+
+  .wrap{position:relative; z-index:1; min-height:100svh; display:flex; justify-content:center;
+    padding:max(22px, env(safe-area-inset-top)) 18px max(22px, env(safe-area-inset-bottom));}
+  /* doble marco de neón, como el cartel del local */
+  .frame{position:relative; width:100%; max-width:440px; min-height:calc(100svh - 44px);
+    border:2px solid var(--pink); border-radius:30px; padding:10px;
+    box-shadow:0 0 14px rgba(233,71,128,.75), 0 0 42px rgba(233,71,128,.35), inset 0 0 18px rgba(233,71,128,.35);
+    animation:hum 7s infinite;}
+  .frame-in{position:relative; height:100%; min-height:calc(100svh - 68px);
+    border:1.5px solid var(--cyan); border-radius:22px;
+    box-shadow:0 0 10px rgba(43,184,209,.7), inset 0 0 14px rgba(43,184,209,.25);
+    display:flex; flex-direction:column; align-items:center; padding:30px 20px 24px;}
+
+  .tag{font-size:11px; font-weight:700; letter-spacing:.42em; text-transform:uppercase; color:var(--cyan-hi);
+    text-shadow:0 0 8px rgba(43,184,209,.9); text-align:center}
+  .logo{width:min(66%, 260px); height:auto; margin:16px 0 2px;
+    filter:drop-shadow(0 0 6px rgba(255,111,163,.9)) drop-shadow(0 0 22px rgba(233,71,128,.65));
+    animation:flicker 6s infinite;}
+  .open{display:inline-flex; align-items:center; gap:8px; margin-top:14px;
+    font-family:Boldonse, Impact, sans-serif; font-size:13px; letter-spacing:.12em; color:var(--pink-hi);
+    padding:9px 14px 7px; border:1.5px solid var(--pink); border-radius:999px;
+    text-shadow:0 0 8px rgba(233,71,128,.9); box-shadow:0 0 12px rgba(233,71,128,.45), inset 0 0 8px rgba(233,71,128,.3)}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--pink-hi); box-shadow:0 0 8px var(--pink-hi); animation:blink 1.6s infinite}
+
+  .intro{margin:24px 0 20px; text-align:center}
+  .intro h1{font-family:Boldonse, Impact, sans-serif; font-weight:400; font-size:clamp(17px, 5vw, 22px);
+    line-height:1.45; text-transform:uppercase; letter-spacing:.01em}
+  .intro h1 span{color:var(--pink); text-shadow:0 0 10px rgba(233,71,128,.75)}
+  .intro p{margin-top:8px; font-size:14.5px; line-height:1.5; color:var(--soft)}
+
+  nav{width:100%; display:flex; flex-direction:column; gap:14px}
+  .link{position:relative; display:flex; align-items:center; gap:14px; width:100%;
+    padding:14px 14px 14px 12px; border-radius:16px; text-decoration:none; color:var(--ink);
+    background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+    border:1.5px solid rgba(233,71,128,.75);
+    box-shadow:0 0 0 rgba(0,0,0,0), 0 0 14px rgba(233,71,128,.22), inset 0 0 12px rgba(233,71,128,.12);
+    transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    -webkit-tap-highlight-color:transparent; opacity:0; transform:translateY(10px); animation:rise .55s ease forwards}
+  .link:nth-child(1){animation-delay:.15s} .link:nth-child(2){animation-delay:.27s} .link:nth-child(3){animation-delay:.39s}
+  .link.cyan{border-color:rgba(43,184,209,.8); box-shadow:0 0 14px rgba(43,184,209,.22), inset 0 0 12px rgba(43,184,209,.12)}
+  .link:hover,.link:focus-visible{border-color:var(--pink-hi); background:rgba(233,71,128,.10);
+    box-shadow:0 0 22px rgba(233,71,128,.55), inset 0 0 16px rgba(233,71,128,.25); outline:none}
+  .link.cyan:hover,.link.cyan:focus-visible{border-color:var(--cyan-hi); background:rgba(43,184,209,.09);
+    box-shadow:0 0 22px rgba(43,184,209,.55), inset 0 0 16px rgba(43,184,209,.25)}
+  .link:active{transform:scale(.985)}
+  .ico{flex:none; width:46px; height:46px; border-radius:12px; display:grid; place-items:center;
+    background:rgba(233,71,128,.12); border:1px solid rgba(233,71,128,.45)}
+  .cyan .ico{background:rgba(43,184,209,.12); border-color:rgba(43,184,209,.45)}
+  .ico svg{width:22px; height:22px; stroke:var(--pink-hi); filter:drop-shadow(0 0 4px rgba(233,71,128,.9))}
+  .cyan .ico svg{stroke:var(--cyan-hi); filter:drop-shadow(0 0 4px rgba(43,184,209,.9))}
+  .txt{flex:1; min-width:0}
+  .txt b{display:block; font-size:16.5px; font-weight:700; letter-spacing:.01em}
+  .txt small{display:block; margin-top:3px; font-size:13px; color:var(--soft); line-height:1.35}
+  .go{flex:none; width:30px; height:30px; display:grid; place-items:center; color:var(--muted); transition:transform .2s, color .2s}
+  .link:hover .go{transform:translateX(3px); color:var(--ink)}
+
+  .spacer{flex:1; min-height:28px}
+  footer{width:100%; text-align:center; padding-top:18px; border-top:1px solid rgba(255,255,255,.08)}
+  .slogan{font-size:13px; font-weight:600; color:var(--ink); letter-spacing:.01em}
+  .info{margin-top:6px; font-size:12px; color:var(--muted); line-height:1.6}
+  .by{margin-top:14px; font-size:10.5px; font-weight:700; letter-spacing:.32em; text-transform:uppercase; color:var(--muted)}
+
+  @keyframes flicker{0%,18%,22%,62%,64%,100%{opacity:1} 20%{opacity:.55} 63%{opacity:.75}}
+  @keyframes hum{0%,100%{box-shadow:0 0 14px rgba(233,71,128,.75),0 0 42px rgba(233,71,128,.35),inset 0 0 18px rgba(233,71,128,.35)}
+    50%{box-shadow:0 0 18px rgba(233,71,128,.85),0 0 54px rgba(233,71,128,.42),inset 0 0 22px rgba(233,71,128,.4)}}
+  @keyframes blink{0%,60%,100%{opacity:1} 30%{opacity:.25}}
+  @keyframes rise{to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important} .link{opacity:1; transform:none}}
+  @media (min-width:700px){ .frame{min-height:auto; margin:auto 0} .frame-in{min-height:760px} }
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="floor"></div>
+<main class="wrap">
+  <div class="frame"><div class="frame-in">
+    <p class="tag">Paraná · desde 2026</p>
+    <img class="logo" src="logo.png" alt="Vice Burgers &amp; Fries" width="640" height="220">
+    <span class="open"><span class="dot"></span>ABIERTO DE NOCHE</span>
+
+    <div class="intro">
+      <h1>Todo lo de la <span>marca</span>, en un lugar.</h1>
+      <p>Archivos, calendario y estrategia.</p>
+    </div>
+
+    <nav aria-label="Accesos de la marca">
+      <a class="link" href="https://drive.google.com/drive/folders/1cT3BC9TqRioaQvVxwRlZWM43mjPh_cGk?usp=sharing" target="_blank" rel="noopener noreferrer">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7v7.8A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/></svg></span>
+        <span class="txt"><b>Drive</b><small>Fotos, videos y piezas de la marca</small></span>
+        <span class="go" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+      <a class="link cyan" href="https://trello.com/invite/b/6aad67718ce0494ed30f0efd/ATTI06c75554fdb23015e3bed2557a7b86147F44800C/scl-vice" target="_blank" rel="noopener noreferrer">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4M8 13.5h2M14 13.5h2M8 17h2"/></svg></span>
+        <span class="txt"><b>Calendario</b><small>Qué se publica y cuándo · Trello</small></span>
+        <span class="go" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+      <a class="link" href="https://drive.google.com/drive/folders/10brbDqcdEKGXZUvihRXYV3AaDfIMHCIH?usp=sharing" target="_blank" rel="noopener noreferrer">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V6.5M4 19.5h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg></span>
+        <span class="txt"><b>Análisis inicial</b><small>Diagnóstico y concepto de marca</small></span>
+        <span class="go" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+    </nav>
+
+    <div class="spacer"></div>
+    <footer>
+      <p class="slogan">No inventamos nada, lo hicimos bien.</p>
+      <p class="info">Irigoyen 301 · Martes a domingo desde las 20</p>
+      <p class="by">Ideamia estudio</p>
+    </footer>
+  </div></div>
+</main>
+</body>
+</html>
