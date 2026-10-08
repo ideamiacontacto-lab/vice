@@ -63,7 +63,7 @@
     if (!s) return '';
     const bloques = s.split(/\n(?=\s*(?:historia|placa|escena|slide|portada)\s*\d*\s*:)/i);
     return bloques.map(b => {
-      const lineas = b.split('\n').map(l => l.trim()).filter(Boolean);
+      const lineas = b.split('\n').map(l => l.trim().replace(/^(?:\d+\.\s+)+(?=\d+\.\s)/, '')).filter(Boolean);
       let titulo = '';
       if (/^(historia|placa|escena|slide|portada)\s*\d*\s*:$/i.test(lineas[0] || '')) titulo = lineas.shift().replace(/:$/, '');
       const html = lineas.map(l => {
