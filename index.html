@@ -163,6 +163,14 @@
   .msg.cl{align-self:flex-end; background:rgba(233,71,128,.14); border:1px solid rgba(233,71,128,.4); border-bottom-right-radius:4px}
   .msg.eq{align-self:flex-start; background:rgba(43,184,209,.1); border:1px solid rgba(43,184,209,.4); border-bottom-left-radius:4px}
   .msg-q{font-size:10.5px; font-weight:700; letter-spacing:.06em; color:var(--muted); margin-bottom:3px}
+  .msg-acc{display:flex; align-items:center; justify-content:flex-end; gap:4px; margin-top:6px; font-size:12px; color:var(--soft)}
+  .msg-acc span{margin-right:auto} .msg-acc .err{color:#ff8a8a}
+  .msg-acc button{font:inherit; font-size:11.5px; font-weight:600; color:var(--soft); background:transparent; border:0; padding:4px 8px; border-radius:999px; cursor:pointer}
+  .msg-acc button:hover{color:var(--ink); background:rgba(255,255,255,.06)}
+  .msg-acc button.pri{color:#181816; background:var(--pink-hi)}
+  .msg-acc button:disabled{opacity:.5}
+  .msg-ed{display:block; width:100%; margin-top:2px; font:inherit; font-size:16px; color:var(--ink); background:rgba(0,0,0,.25); border:1px solid rgba(233,71,128,.6); border-radius:10px; padding:8px 10px; resize:vertical; outline:none}
+  .msg.cl:has(.msg-ed){max-width:100%; width:100%}
   .coment{margin-top:12px; display:flex; flex-direction:column; gap:8px}
   .coment input,.coment textarea{width:100%; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,.04);
     border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:10px 12px; resize:vertical; outline:none; transition:border-color .2s}
@@ -375,6 +383,6 @@
   ir(location.hash.slice(1), true);
 })();
 </script>
-<script src="calendario.js?v=8" defer></script>
+<script src="calendario.js?v=9" defer></script>
 </body>
 </html>

@@ -164,9 +164,20 @@
     const b = e.target.closest('.item'); if (b) ver(+b.dataset.i);
   });
 
-  /* ---------- comentarios: el cliente escribe, queda en la tarjeta de Trello; el equipo responde con "Para el cliente: …" ---------- */
+  /* ---------- comentarios: el cliente escribe, queda en la tarjeta de Trello; el equipo responde con "Para el cliente: …" ----------
+     Los que se mandaron desde este celular se pueden editar o borrar: al mandarlos el servidor devuelve una clave que queda acá. */
   const guardado = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
-  const msgHtml = m => '<div class="msg ' + (m.de === 'equipo' ? 'eq' : 'cl') + '"><p class="msg-q">' + esc(m.q) + ' · ' + esc(dm(m.f)) + ' ' + hora(m.f) + ' h</p><p>' + esc(m.t).replace(/\n/g, '<br>') + '</p></div>';
+  const mios = () => { try { return JSON.parse(localStorage.getItem('vice:mios') || '{}'); } catch (e) { return {}; } };
+  const guardarMios = o => { try { localStorage.setItem('vice:mios', JSON.stringify(o)); } catch (e) {} };
+  const api = body => fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ marca: MARCA }, body)) })
+    .then(x => x.json()).then(r => { if (!r.ok) throw new Error(r.mensaje || 'No se pudo'); return r; });
+  let CUR = -1;
+  function msgHtml(m) {
+    const propio = m.de === 'cliente' && m.id && mios()[m.id];
+    return '<div class="msg ' + (m.de === 'equipo' ? 'eq' : 'cl') + '"' + (propio ? ' data-c="' + esc(m.id) + '"' : '') + '><p class="msg-q">' + esc(m.q) + ' · ' + esc(dm(m.f)) + ' ' + hora(m.f) + ' h' + (m.ed ? ' · editado' : '') + '</p>'
+      + '<p class="msg-t">' + esc(m.t).replace(/\n/g, '<br>') + '</p>'
+      + (propio ? '<p class="msg-acc"><button type="button" data-acc="editar">Editar</button><button type="button" data-acc="borrar">Borrar</button></p>' : '') + '</div>';
+  }
   function comentariosHtml(it, i) {
     const hilo = (it.comentarios || []).map(msgHtml).join('');
     return '<h4>Comentarios</h4><div class="hilo">' + (hilo || '<p class="hilo-vacio">¿Algo para cambiar o sumar? Dejanos un comentario y le llega al equipo.</p>') + '</div>'
@@ -175,6 +186,7 @@
       + '<textarea name="texto" rows="3" maxlength="1500" placeholder="Escribí tu comentario…" required></textarea>'
       + '<div class="c-pie"><p class="c-estado" role="status"></p><button type="submit">Enviar</button></div></form>';
   }
+  const pintarHilo = () => { const h = hojaIn.querySelector('.hilo'), it = ITEMS[CUR]; if (h && it) h.innerHTML = (it.comentarios || []).map(msgHtml).join('') || '<p class="hilo-vacio">¿Algo para cambiar o sumar? Dejanos un comentario y le llega al equipo.</p>'; };
   async function enviar(f) {
     const it = ITEMS[+f.dataset.i], est = f.querySelector('.c-estado'), btn = f.querySelector('button');
     const nombre = f.nombre.value.trim(), texto = f.texto.value.trim();
@@ -182,23 +194,48 @@
     try { localStorage.setItem('vice:nombre', nombre); } catch (e) {}
     btn.disabled = true; est.className = 'c-estado'; est.textContent = 'Enviando…';
     try {
-      const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'comentarCliente', marca: MARCA, cardId: it.id, nombre: nombre, texto: texto }) }).then(x => x.json());
-      if (!r.ok) throw new Error(r.mensaje || 'No se pudo enviar');
-      const m = { de: 'cliente', q: nombre || 'Cliente', t: texto, f: new Date().toISOString() };
-      (it.comentarios = it.comentarios || []).push(m);
-      const hilo = f.previousElementSibling, vacio = hilo.querySelector('.hilo-vacio');
-      if (vacio) vacio.remove();
-      hilo.insertAdjacentHTML('beforeend', msgHtml(m));
+      const r = await api({ action: 'comentarCliente', cardId: it.id, nombre: nombre, texto: texto });
+      if (r.id && r.tok) { const o = mios(); o[r.id] = r.tok; guardarMios(o); }
+      (it.comentarios = it.comentarios || []).push({ de: 'cliente', q: nombre || 'Cliente', t: texto, f: new Date().toISOString(), id: r.id });
+      pintarHilo();
       f.texto.value = ''; est.className = 'c-estado ok'; est.textContent = '✓ Listo, el equipo ya lo ve.';
       pintar();
     } catch (e) { est.className = 'c-estado err'; est.textContent = e.message || 'No se pudo enviar. Probá de nuevo.'; }
     btn.disabled = false;
   }
+  async function accionComentario(btn) {
+    const box = btn.closest('.msg'), id = box.dataset.c, it = ITEMS[CUR], m = (it.comentarios || []).filter(x => x.id === id)[0];
+    if (!m) return;
+    const acc = btn.dataset.acc, tok = mios()[id];
+    if (acc === 'editar') {
+      box.querySelector('.msg-t').outerHTML = '<textarea class="msg-ed" rows="3" maxlength="1500">' + esc(m.t) + '</textarea>';
+      box.querySelector('.msg-acc').innerHTML = '<button type="button" data-acc="cancelar">Cancelar</button><button type="button" class="pri" data-acc="guardar">Guardar</button>';
+      const ta = box.querySelector('.msg-ed'); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+      return;
+    }
+    if (acc === 'cancelar') return pintarHilo();
+    if (acc === 'borrar') {
+      box.querySelector('.msg-acc').innerHTML = '<span>¿Borrarlo?</span><button type="button" data-acc="cancelar">No</button><button type="button" class="pri" data-acc="si-borrar">Sí, borrar</button>';
+      return;
+    }
+    const texto = acc === 'guardar' ? box.querySelector('.msg-ed').value.trim() : '';
+    if (acc === 'guardar' && !texto) return box.querySelector('.msg-ed').focus();
+    box.querySelectorAll('button').forEach(b => b.disabled = true);
+    try {
+      await api({ action: 'cambiarComentarioCliente', id: id, tok: tok, nombre: m.q, texto: texto, borrar: acc === 'si-borrar' });
+      if (acc === 'si-borrar') { it.comentarios = it.comentarios.filter(x => x.id !== id); const o = mios(); delete o[id]; guardarMios(o); }
+      else { m.t = texto; m.ed = true; }
+      pintarHilo(); pintar();
+    } catch (e) {
+      box.querySelectorAll('button').forEach(b => b.disabled = false);
+      box.querySelector('.msg-acc').insertAdjacentHTML('afterbegin', '<span class="err">' + esc(e.message) + '</span>');
+    }
+  }
 
   /* ---------- detalle (hoja que sube desde abajo) ---------- */
   const hoja = $('#hoja'), hojaIn = $('#hoja-in');
   function ver(i) {
+    CUR = i;
     const it = ITEMS[i], r = resumen(it), c = copyHtml(it.copy);
     hojaIn.innerHTML = '<button class="cerrar" aria-label="Cerrar">×</button>'
       + '<p class="hoja-k">' + esc(it.formato) + ' · ' + esc(larga(it.salida)) + ' · ' + hora(it.salida) + ' h</p>'
@@ -215,6 +252,7 @@
   function cerrar() { hoja.classList.remove('on'); document.body.style.overflow = ''; setTimeout(() => { hoja.hidden = true; }, 250); }
   hoja.addEventListener('click', e => {
     if (e.target === hoja || e.target.closest('.cerrar')) return cerrar();
+    const acc = e.target.closest('.msg-acc button'); if (acc) return accionComentario(acc);
     const p = e.target.closest('.dplay');
     if (p) p.outerHTML = '<iframe class="dframe" src="https://drive.google.com/file/d/' + encodeURIComponent(p.dataset.drive) + '/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>';
   });
