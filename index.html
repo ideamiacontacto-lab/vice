@@ -208,7 +208,48 @@
     .dia{margin-top:14px}
   }
   /* en la pestaña Calendario el encabezado grande se oculta: el calendario queda arriba de todo */
-  body[data-tab="calendario"] .tag, body[data-tab="calendario"] .logo, body[data-tab="calendario"] .open{display:none}
+  body[data-tab="calendario"] .tag, body[data-tab="calendario"] .logo, body[data-tab="calendario"] .open,
+  body[data-tab="anual"] .tag, body[data-tab="anual"] .logo, body[data-tab="anual"] .open{display:none}
+  /* calendario anual */
+  .anual{margin-top:4px}
+  .an-meses{display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; width:100%}
+  .an-m{display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 0 7px; border-radius:11px; border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.03); font:inherit; color:var(--soft); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .15s, background .15s}
+  .an-m b{font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase}
+  .an-m span{display:flex; gap:3px; height:5px}
+  .an-m i{width:5px; height:5px; border-radius:50%; background:var(--muted)}
+  .an-m.hoy b{color:var(--cyan-hi)}
+  .an-m.sel{color:var(--ink); border-color:var(--pink); background:rgba(233,71,128,.14); box-shadow:0 0 10px rgba(233,71,128,.3)}
+  .an-filtros{display:flex; flex-wrap:wrap; align-items:center; gap:6px; width:100%; margin-top:10px}
+  .an-sep{width:1px; height:18px; background:rgba(255,255,255,.14); margin:0 3px}
+  .an-f{display:inline-flex; align-items:center; gap:5px; padding:5px 9px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:transparent;
+    font:inherit; font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--muted); cursor:pointer; -webkit-tap-highlight-color:transparent}
+  .an-f i{width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.35}
+  .an-f.on{color:var(--ink); border-color:rgba(255,255,255,.3)} .an-f.on i{opacity:1}
+  .an-f.n1.on i, i.n1{background:var(--pink-hi)!important; box-shadow:0 0 5px rgba(233,71,128,.8)}
+  .an-f.n2.on i, i.n2{background:var(--cyan-hi)!important; box-shadow:0 0 5px rgba(43,184,209,.8)}
+  .an-f.n3.on i, i.n3{background:#ffd28a!important}
+  .an-f.n4.on i, i.n4{background:#8f8a81!important}
+  .an-lista{width:100%; margin-top:10px; max-height:calc(100svh - 552px); min-height:180px; overflow-y:auto; overscroll-behavior:contain; padding-right:2px}
+  .an-t{font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--pink-hi); margin:2px 2px 8px; display:flex; align-items:center; gap:10px}
+  .an-t span{color:var(--muted)} .an-t::after{content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(233,71,128,.5), transparent)}
+  .an-fijo{display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; padding:9px 12px; margin-bottom:8px; border-radius:12px;
+    border:1px dashed rgba(233,71,128,.5); background:rgba(233,71,128,.06)}
+  .an-fijo i{width:7px; height:7px; border-radius:50%} .an-fijo b{font-size:13.5px; color:var(--ink)} .an-fijo span{grid-column:2; font-size:12px; color:var(--soft); line-height:1.4}
+  .an-c{display:grid; grid-template-columns:48px 1fr; gap:12px; width:100%; text-align:left; font:inherit; color:var(--ink); cursor:pointer; margin-bottom:8px;
+    padding:11px 12px; border-radius:14px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.1); transition:border-color .2s, background .2s; -webkit-tap-highlight-color:transparent}
+  .an-c:hover,.an-c.ab{border-color:rgba(233,71,128,.6); background:rgba(233,71,128,.06)}
+  .an-d{display:flex; flex-direction:column; align-items:center; justify-content:center; border-right:1px solid rgba(255,255,255,.1); padding-right:10px}
+  .an-d b{font-family:Boldonse, Impact, sans-serif; font-size:19px; font-weight:400; line-height:1.3; color:var(--ink)}
+  .an-d small{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .an-b{display:flex; flex-direction:column; gap:5px; min-width:0}
+  .an-b > b{font-size:15px; font-weight:700; line-height:1.3}
+  .an-tags{display:flex; flex-wrap:wrap; gap:5px}
+  .an-tags em{font-style:normal; font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.14); color:var(--soft)}
+  .an-tags em.n1{color:var(--pink-hi); border-color:rgba(233,71,128,.55)} .an-tags em.n2{color:var(--cyan-hi); border-color:rgba(43,184,209,.55)}
+  .an-tags em.n3{color:#ffd28a; border-color:rgba(255,190,90,.5)} .an-tags em.n4{color:var(--muted)}
+  .an-desc{font-size:13.5px; line-height:1.45; color:var(--soft); margin-top:4px}
+  .an-cuando{font-size:12px; font-weight:600; color:var(--cyan-hi); margin-top:2px}
   /* hoja de detalle */
   .hoja{position:fixed; inset:0; z-index:20; background:rgba(8,8,7,.6); backdrop-filter:blur(3px); display:flex; align-items:flex-end; justify-content:center;
     opacity:0; transition:opacity .25s}
@@ -301,6 +342,9 @@
         <button class="tab" role="tab" id="t-calendario" aria-controls="p-calendario" aria-selected="false" data-tab="calendario">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="9" cy="14" r="1.2" fill="currentColor"/><circle cx="15" cy="14" r="1.2" fill="currentColor"/></svg><span>Calendario</span>
         </button>
+        <button class="tab" role="tab" id="t-anual" aria-controls="p-anual" aria-selected="false" data-tab="anual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M9 4v16M15 4v16"/></svg><span>Anual</span>
+        </button>
       </div>
     </div>
 
@@ -348,6 +392,18 @@
       <p class="cal-pie" id="cal-estado"></p>
     </section>
 
+    <section class="panel anual" id="p-anual" role="tabpanel" aria-labelledby="t-anual" hidden>
+      <div class="cal-h">
+        <p class="cal-k"><span class="dot"></span>Calendario anual</p>
+        <h2>Las fechas del año</h2>
+        <p class="cal-s">Elegí un mes. Tocá una fecha para ver la idea y cuándo arrancar.</p>
+      </div>
+      <div class="an-meses" id="an-meses"></div>
+      <div class="an-filtros" id="an-filtros"></div>
+      <div class="an-lista" id="an-lista"></div>
+      <p class="cal-pie">N1 campañas mayores · N2 especiales · N3 bajas · N4 mención</p>
+    </section>
+
     <div class="spacer"></div>
     <footer>
       <p class="slogan">No inventamos nada, lo hicimos bien.</p>
@@ -362,7 +418,7 @@
 (function () {
   const tabs = [...document.querySelectorAll('.tab')];
   function ir(nombre, desdeHash) {
-    if (['recursos', 'calendario'].indexOf(nombre) < 0) nombre = 'recursos';
+    if (['recursos', 'calendario', 'anual'].indexOf(nombre) < 0) nombre = 'recursos';
     tabs.forEach(t => {
       const on = t.dataset.tab === nombre;
       t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
@@ -383,6 +439,8 @@
   ir(location.hash.slice(1), true);
 })();
 </script>
-<script src="calendario.js?v=9" defer></script>
+<script src="anual.js?v=1"></script>
+<script src="anual-ui.js?v=1" defer></script>
+<script src="calendario.js?v=10" defer></script>
 </body>
 </html>
