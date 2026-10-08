@@ -2,7 +2,7 @@
    a través del Apps Script del Panel Ideamia (action=cliente). Solo lectura. */
 (function () {
   const API = 'https://script.google.com/macros/s/AKfycbwCxld4KNBsNMSGGluIA138f1vaKBo2TnqMIXsO2Y8iV87k4d7NUic47-MpvEgYehZJ/exec';
-  const MARCA = 'vice-burger', DIAS = 15, TZ = 'America/Argentina/Cordoba', VISIBLES = 99;
+  const MARCA = 'vice-burger', DIAS = 15, TZ = 'America/Argentina/Cordoba';
   const $ = s => document.querySelector(s);
   const box = $('#cal-lista'), estado = $('#cal-estado');
   if (!box) return;
@@ -116,35 +116,46 @@
     }).join('') + '</div>';
   }
 
-  /* ---------- lista por día ---------- */
-  let ITEMS = [], abierto = false;
+  /* ---------- calendario: grilla de semanas (lun–dom) + lo del día elegido ---------- */
+  let ITEMS = [], SEL = null;
+  const ymd = iso => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(iso));
+  const dUTC = s => new Date(s + 'T12:00:00Z');
+  const sumar = (s, n) => new Date(dUTC(s).getTime() + n * 864e5).toISOString().slice(0, 10);
+  const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  const DSEM = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+  const tono = it => it.estado === 'publicado' || it.estado === 'programado' || it.estado === 'listo' ? 'ok' : it.partes.some(p => p.estado === 'revision') ? 'rev' : 'pen';
   function pintar() {
-    if (!ITEMS.length) { box.innerHTML = '<p class="vacio">No hay publicaciones cargadas para los próximos ' + DIAS + ' días.</p>'; return; }
-    const grupos = [];
-    ITEMS.forEach((it, i) => {
-      const k = diaClave(it.salida), g = grupos[grupos.length - 1];
-      if (g && g.k === k) g.items.push(i); else grupos.push({ k: k, iso: it.salida, items: [i] });
-    });
-    let n = 0, html = '';
-    grupos.forEach(g => {
-      if (!abierto && n >= VISIBLES) return;
-      const rot = g.k === hoyClave ? 'Hoy' : g.k === manana ? 'Mañana' : larga(g.iso);
-      html += '<div class="dia"><p class="dia-t">' + esc(rot.charAt(0).toUpperCase() + rot.slice(1)) + '</p>';
-      g.items.forEach(i => {
-        n++;
-        const it = ITEMS[i], r = resumen(it);
-        html += '<button class="item" data-i="' + i + '"><span class="item-h"><span class="fmt">' + esc(it.formato) + '</span><span class="hr">' + hora(it.salida) + ' h</span></span>'
-          + '<b>' + esc(it.n) + '</b>'
-          + (r ? '<small>' + esc(r) + '</small>' : '')
-          + '<span class="sts">' + it.partes.map(chip).join('') + '</span></button>';
-      });
-      html += '</div>';
-    });
-    if (ITEMS.length > n || abierto) html += '<button class="mas" id="cal-mas">' + (abierto ? 'Ver menos' : 'Ver las ' + ITEMS.length + ' publicaciones') + '</button>';
-    box.innerHTML = html;
+    const hoy = ymd(new Date().toISOString()), fin = sumar(hoy, DIAS);
+    const porDia = {};
+    ITEMS.forEach((it, i) => (porDia[ymd(it.salida)] = porDia[ymd(it.salida)] || []).push(i));
+    if (!SEL || SEL < hoy || SEL > fin) SEL = Object.keys(porDia).sort()[0] || hoy;
+    const dow = s => (dUTC(s).getUTCDay() + 6) % 7; // lunes = 0
+    const desde = sumar(hoy, -dow(hoy)), hasta = sumar(fin, 6 - dow(fin));
+    const m1 = +desde.slice(5, 7) - 1, m2 = +hasta.slice(5, 7) - 1;
+    let html = '<div class="cg"><div class="cg-h"><p class="cg-mes">' + (m1 === m2 ? MESES[m1] : MESES[m1] + ' – ' + MESES[m2]) + ' <span>' + hasta.slice(0, 4) + '</span></p>'
+      + '</div>'
+      + '<div class="cg-sem">' + ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(x => '<span>' + x + '</span>').join('') + '</div><div class="cg-grid">';
+    for (let s = desde; s <= hasta; s = sumar(s, 1)) {
+      const fuera = s < hoy || s > fin, ids = porDia[s] || [];
+      const cls = 'cg-d' + (fuera ? ' fuera' : '') + (s === hoy ? ' hoy' : '') + (s === SEL ? ' sel' : '') + (ids.length ? ' con' : '');
+      const dots = ids.slice(0, 3).map(i => '<i class="' + tono(ITEMS[i]) + '"></i>').join('') + (ids.length > 3 ? '<em>+' + (ids.length - 3) + '</em>' : '');
+      const nom = DSEM[dow(s)] + ' ' + (+s.slice(8)) + '/' + (+s.slice(5, 7)) + (ids.length ? ', ' + ids.length + (ids.length > 1 ? ' publicaciones' : ' publicación') : ', sin publicaciones');
+      html += fuera ? '<span class="' + cls + '" aria-hidden="true"><b>' + (+s.slice(8)) + '</b></span>'
+        : '<button class="' + cls + '" data-d="' + s + '" aria-label="' + nom + '"' + (s === SEL ? ' aria-pressed="true"' : '') + '><b>' + (+s.slice(8)) + '</b><span class="pts">' + dots + '</span></button>';
+    }
+    html += '</div><p class="cg-ley"><i class="ok"></i>Listo<i class="rev"></i>En revisión<i class="pen"></i>En proceso</p></div>';
+    const ids = porDia[SEL] || [], rot = SEL === hoy ? 'Hoy' : SEL === sumar(hoy, 1) ? 'Mañana' : DSEM[dow(SEL)].charAt(0).toUpperCase() + DSEM[dow(SEL)].slice(1);
+    html += '<div class="dia"><p class="dia-t">' + esc(rot) + ' ' + (+SEL.slice(8)) + '/' + (+SEL.slice(5, 7)) + '<span>' + (ids.length ? ids.length + (ids.length > 1 ? ' publicaciones' : ' publicación') : '') + '</span></p>';
+    html += ids.length ? ids.map(i => {
+      const it = ITEMS[i], r = resumen(it);
+      return '<button class="item" data-i="' + i + '"><span class="item-h"><span class="fmt">' + esc(it.formato) + '</span><span class="hr">' + hora(it.salida) + ' h</span></span>'
+        + '<b>' + esc(it.n) + '</b>' + (r ? '<small>' + esc(r) + '</small>' : '')
+        + '<span class="sts">' + it.partes.map(chip).join('') + '</span></button>';
+    }).join('') : '<p class="vacio">No hay nada programado para este día.</p>';
+    box.innerHTML = html + '</div>';
   }
   box.addEventListener('click', e => {
-    if (e.target.closest('#cal-mas')) { abierto = !abierto; pintar(); return; }
+    const d = e.target.closest('.cg-d[data-d]'); if (d) { SEL = d.dataset.d; pintar(); return; }
     const b = e.target.closest('.item'); if (b) ver(+b.dataset.i);
   });
 

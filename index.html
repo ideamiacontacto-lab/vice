@@ -107,7 +107,6 @@
   .cal-k .dot{background:var(--cyan-hi); box-shadow:0 0 8px var(--cyan-hi)}
   .cal h2{margin-top:8px; font-family:Boldonse, Impact, sans-serif; font-weight:400; font-size:19px; line-height:1.45; text-transform:uppercase}
   .cal-s{margin-top:6px; font-size:13px; line-height:1.45; color:var(--soft)}
-  .dia{margin-top:14px}
   .dia-t{font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--pink-hi); margin:0 2px 8px;
     display:flex; align-items:center; gap:10px}
   .dia-t::after{content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(233,71,128,.5), transparent)}
@@ -129,6 +128,34 @@
     color:var(--pink-hi); background:transparent; border:1px dashed rgba(233,71,128,.6)}
   .vacio{font-size:13px; color:var(--muted); text-align:center; padding:14px 0}
   .cal-pie{margin-top:10px; font-size:11px; color:var(--muted); text-align:center}
+  /* grilla del calendario */
+  .cg{width:100%; padding:14px 12px 12px; border-radius:18px; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.09)}
+  .cg-h{display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:0 4px 12px}
+  .cg-mes{white-space:nowrap; font-family:Boldonse, Impact, sans-serif; font-size:13px; line-height:1.45; text-transform:uppercase; letter-spacing:.02em}
+  .cg-mes span{color:var(--pink)}
+  .cg-ley{display:flex; align-items:center; justify-content:center; gap:5px; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,.07); font-size:10.5px; color:var(--muted); white-space:nowrap}
+  .cg-ley i{margin-left:9px} .cg-ley i:first-child{margin-left:0}
+  .cg-sem,.cg-grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:4px}
+  .cg-sem span{text-align:center; font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--muted); padding-bottom:6px}
+  .cg-d{position:relative; aspect-ratio:1/1.08; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+    border-radius:11px; border:1px solid transparent; background:transparent; font:inherit; color:var(--ink); padding:0; -webkit-tap-highlight-color:transparent}
+  button.cg-d{cursor:pointer; transition:background .15s, border-color .15s}
+  button.cg-d:hover{background:rgba(255,255,255,.05)}
+  .cg-d b{font-size:14px; font-weight:600; line-height:1}
+  .cg-d.fuera{color:#45423d}
+  .cg-d.con{background:rgba(255,255,255,.035)}
+  .cg-d.hoy b{color:var(--cyan-hi); text-shadow:0 0 8px rgba(43,184,209,.8)}
+  .cg-d.sel{border-color:var(--pink); background:rgba(233,71,128,.13); box-shadow:0 0 12px rgba(233,71,128,.35), inset 0 0 8px rgba(233,71,128,.2)}
+  .cg-d.sel b{color:var(--ink)}
+  .pts{display:flex; align-items:center; gap:3px; height:6px}
+  .pts i,.cg-ley i{display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--muted)}
+  .pts em{font-size:8.5px; font-style:normal; color:var(--soft)}
+  i.ok{background:var(--cyan-hi)!important; box-shadow:0 0 5px var(--cyan)}
+  i.rev{background:#ffd28a!important}
+  i.pen{background:var(--pink-hi)!important; box-shadow:0 0 5px rgba(233,71,128,.8)}
+  .cg-d:focus-visible{outline:1.5px solid var(--cyan); outline-offset:1px}
+  .dia{width:100%; margin-top:18px}
+  .dia-t span{margin-left:auto; order:3; font-size:10.5px; letter-spacing:.08em; color:var(--muted); text-transform:none}
   /* hoja de detalle */
   .hoja{position:fixed; inset:0; z-index:20; background:rgba(8,8,7,.6); backdrop-filter:blur(3px); display:flex; align-items:flex-end; justify-content:center;
     opacity:0; transition:opacity .25s}
@@ -177,22 +204,19 @@
   .dlink{display:inline-block; margin-top:6px; font-size:12.5px; color:var(--cyan-hi)}
   .trello{display:block; margin-top:22px; padding:13px; text-align:center; border-radius:12px; font-size:14px; font-weight:600; text-decoration:none;
     color:var(--ink); border:1.5px solid rgba(43,184,209,.7); box-shadow:0 0 12px rgba(43,184,209,.2)}
-  /* pestañas (barra de arriba): Recursos · Calendario */
-  .tabs-wrap{position:sticky; top:0; z-index:10; width:100%; display:flex; justify-content:center; padding-top:40px; margin:-34px 0 22px;
-    background:linear-gradient(to bottom, rgba(18,18,16,.97) 72%, rgba(18,18,16,0)); border-radius:22px 22px 0 0}
-  .tabs{display:flex; gap:6px; padding:8px; border-radius:999px; background:var(--ink);
-    box-shadow:0 0 0 2px var(--pink), 0 0 22px rgba(233,71,128,.55), 0 10px 30px rgba(0,0,0,.45)}
-  .tab{position:relative; width:76px; height:48px; border:0; border-radius:999px; background:transparent; cursor:pointer; display:grid; place-items:center;
-    color:#3b3833; transition:background .2s, color .2s; -webkit-tap-highlight-color:transparent}
-  .tab svg{width:25px; height:25px}
-  .tab:hover{color:#181816}
-  .tab[aria-selected="true"]{color:var(--pink); background:rgba(233,71,128,.12)}
-  .tab .bub{position:absolute; bottom:calc(100% + 14px); left:50%; transform:translate(-50%, 6px); white-space:nowrap; pointer-events:none;
-    font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#181816; background:var(--ink);
-    padding:7px 12px 7px 14px; border-radius:999px; box-shadow:0 0 14px rgba(233,71,128,.5); opacity:0; transition:opacity .2s, transform .2s}
-  .tab .bub::after{content:""; position:absolute; top:100%; left:50%; margin-left:-6px; border:6px solid transparent; border-top-color:var(--ink)}
-  .tab[aria-selected="true"] .bub{opacity:1; transform:translate(-50%, 0)}
-  .tab:focus-visible{outline:2px solid var(--cyan); outline-offset:2px}
+  /* pestañas: control segmentado chico, fijo arriba */
+  .tabs-wrap{position:sticky; top:10px; z-index:10; display:flex; justify-content:center; margin:0 0 20px}
+  .tabs{position:relative; display:flex; padding:3px; border-radius:999px; background:rgba(18,18,16,.72);
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+    border:1px solid rgba(233,71,128,.55); box-shadow:0 0 14px rgba(233,71,128,.22)}
+  .tab{display:flex; align-items:center; gap:7px; height:30px; padding:0 14px; border:0; border-radius:999px; background:transparent; cursor:pointer;
+    font:inherit; font-size:10.5px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    transition:color .2s, background .2s; -webkit-tap-highlight-color:transparent}
+  .tab svg{width:14px; height:14px; flex:none}
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{color:var(--pink-hi); background:rgba(233,71,128,.14); text-shadow:0 0 8px rgba(233,71,128,.7)}
+  .tab[aria-selected="true"] svg{filter:drop-shadow(0 0 4px rgba(233,71,128,.8))}
+  .tab:focus-visible{outline:1.5px solid var(--cyan); outline-offset:2px}
   .panel{width:100%; display:flex; flex-direction:column; align-items:center}
   .panel[hidden], .hoja[hidden]{display:none}
   .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
@@ -219,14 +243,10 @@
     <div class="tabs-wrap">
       <div class="tabs" role="tablist" aria-label="Secciones">
         <button class="tab" role="tab" id="t-recursos" aria-controls="p-recursos" aria-selected="true" data-tab="recursos">
-          <span class="bub">Recursos</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7v7.8A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M3 10.5h18"/></svg>
-          <span class="sr">Recursos</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7v7.8A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M3 10.5h18"/></svg><span>Recursos</span>
         </button>
         <button class="tab" role="tab" id="t-calendario" aria-controls="p-calendario" aria-selected="false" data-tab="calendario">
-          <span class="bub">Calendario</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="9" cy="14" r="1.2" fill="currentColor"/><circle cx="15" cy="14" r="1.2" fill="currentColor"/></svg>
-          <span class="sr">Calendario</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="9" cy="14" r="1.2" fill="currentColor"/><circle cx="15" cy="14" r="1.2" fill="currentColor"/></svg><span>Calendario</span>
         </button>
       </div>
     </div>
@@ -269,7 +289,7 @@
       <div class="cal-h">
         <p class="cal-k"><span class="dot"></span>Calendario provisorio</p>
         <h2 id="cal-t">Lo que se viene</h2>
-        <p class="cal-s">Próximos 15 días. Tocá una publicación para ver el diseño, el video y el copy, y en qué estado está.</p>
+        <p class="cal-s">Próximos 15 días. Elegí un día y tocá cada publicación para ver diseño, video y copy.</p>
       </div>
       <div id="cal-lista" aria-live="polite"><p class="vacio">Cargando el calendario…</p></div>
       <p class="cal-pie" id="cal-estado"></p>
@@ -309,6 +329,6 @@
   ir(location.hash.slice(1), true);
 })();
 </script>
-<script src="calendario.js?v=5" defer></script>
+<script src="calendario.js?v=7" defer></script>
 </body>
 </html>
