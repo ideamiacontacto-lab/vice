@@ -193,6 +193,7 @@
     if (!texto) { f.texto.focus(); return; }
     try { localStorage.setItem('vice:nombre', nombre); } catch (e) {}
     btn.disabled = true; est.className = 'c-estado'; est.textContent = 'Enviando…';
+    const lento = setTimeout(() => { if (btn.disabled) est.textContent = 'Enviando… puede tardar unos segundos, no cierres.'; }, 3000);
     try {
       const r = await api({ action: 'comentarCliente', cardId: it.id, nombre: nombre, texto: texto });
       if (r.id && r.tok) { const o = mios(); o[r.id] = r.tok; guardarMios(o); }
@@ -201,7 +202,7 @@
       f.texto.value = ''; est.className = 'c-estado ok'; est.textContent = '✓ Listo, el equipo ya lo ve.';
       pintar();
     } catch (e) { est.className = 'c-estado err'; est.textContent = e.message || 'No se pudo enviar. Probá de nuevo.'; }
-    btn.disabled = false;
+    clearTimeout(lento); btn.disabled = false;
   }
   async function accionComentario(btn) {
     const box = btn.closest('.msg'), id = box.dataset.c, it = ITEMS[CUR], m = (it.comentarios || []).filter(x => x.id === id)[0];
