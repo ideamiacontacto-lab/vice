@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vice Burgers &amp; Fries · 10% OFF</title>
+<meta name="description" content="Dejá tu reseña de Vice en Google y llevate 10% OFF en tu próxima compra.">
+<meta name="theme-color" content="#121210">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="../avatar.png">
+<link rel="apple-touch-icon" href="../avatar.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Boldonse&family=Yellowtail&family=Inter:wght@400;500;600;700&display=swap">
+<script>
+  // Completar antes de imprimir el QR.
+  window.CUPON_CFG = {
+    servidor: 'https://script.google.com/macros/s/AKfycby7teQg4MR0Lwze4CrICpsh6sWb2b6Hky9Z5K-FqVvsVLNtiBulX4IV2b3tTcq9AxHn/exec',  // Apps Script "Cupones Vice"
+    resena: 'https://g.page/r/CUMh-u6V9haMEAI/review',  // PROVISORIO: es el de Ideamia. Cambiar por el de Vice cuando verifiquen el perfil.
+    googleClientId: ''  // ID de cliente OAuth (Google Cloud, cuenta de Vice). Vacío = solo mail escrito.
+  };
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    --bg:#121210; --ink:#f3eee6; --soft:#bdb7ac; --muted:#7f7a71;
+    --pink:#e94780; --pink-hi:#ff6fa3; --cyan:#2bb8d1; --cyan-hi:#6fe3f5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{background:var(--bg); color:var(--ink);
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden}
+  .sky{position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(60vmax 40vmax at 15% -5%, rgba(233,71,128,.28), transparent 60%),
+      radial-gradient(55vmax 40vmax at 100% 105%, rgba(43,184,209,.22), transparent 60%);}
+  .floor{position:fixed; left:-25%; right:-25%; bottom:-6vh; height:34vh; z-index:0; pointer-events:none;
+    background:
+      linear-gradient(to top, rgba(18,18,16,0) 0%, var(--bg) 92%),
+      repeating-linear-gradient(90deg, rgba(43,184,209,.22) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, rgba(43,184,209,.22) 0 1px, transparent 1px 48px);
+    transform:perspective(420px) rotateX(62deg); transform-origin:bottom; opacity:.5}
+
+  .wrap{position:relative; z-index:1; min-height:100svh; display:flex; justify-content:center;
+    padding:max(22px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom))}
+  .frame{width:100%; max-width:440px; border:2px solid var(--pink); border-radius:30px; padding:10px;
+    box-shadow:0 0 14px rgba(233,71,128,.75), 0 0 42px rgba(233,71,128,.35), inset 0 0 18px rgba(233,71,128,.35)}
+  .frame-in{border:1.5px solid var(--cyan); border-radius:22px; min-height:calc(100svh - 68px);
+    box-shadow:0 0 10px rgba(43,184,209,.7), inset 0 0 14px rgba(43,184,209,.25);
+    display:flex; flex-direction:column; align-items:center; padding:28px 18px 22px}
+
+  .tag{font-size:11px; font-weight:700; letter-spacing:.42em; text-transform:uppercase; color:var(--cyan-hi);
+    text-shadow:0 0 8px rgba(43,184,209,.9); text-align:center}
+  .logo{width:min(56%, 220px); height:auto; margin:14px 0 0;
+    filter:drop-shadow(0 0 6px rgba(255,111,163,.9)) drop-shadow(0 0 22px rgba(233,71,128,.65));
+    animation:flicker 6s infinite}
+
+  .intro{margin:20px 0 22px; text-align:center}
+  .off{font-family:Boldonse, Impact, sans-serif; font-size:clamp(46px, 16vw, 64px); line-height:1.45;
+    color:var(--pink-hi); text-shadow:0 0 10px rgba(233,71,128,.9), 0 0 30px rgba(233,71,128,.55)}
+  .off small{font-size:.42em; letter-spacing:.06em; margin-left:6px}
+  .intro h1{font-family:Yellowtail, cursive; font-weight:400; font-size:clamp(26px, 8vw, 32px); line-height:1.1;
+    color:var(--cyan-hi); text-shadow:0 0 10px rgba(43,184,209,.8); margin-top:-4px}
+  .intro p{margin-top:12px; font-size:14.5px; line-height:1.5; color:var(--soft)}
+
+  .paso{width:100%; border-radius:18px; padding:16px; margin-bottom:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+    border:1.5px solid rgba(233,71,128,.75); box-shadow:0 0 14px rgba(233,71,128,.25);
+    transition:opacity .3s, border-color .3s}
+  .paso.bloq{opacity:.45; border-color:rgba(255,255,255,.15); box-shadow:none}
+  .paso.hecho{border-color:rgba(43,184,209,.8); box-shadow:0 0 14px rgba(43,184,209,.25)}
+  .paso-t{display:flex; align-items:center; gap:10px; font-size:12px; font-weight:700; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--soft); margin-bottom:12px}
+  .num{display:grid; place-items:center; width:24px; height:24px; border-radius:50%; flex:none;
+    font-family:Boldonse, Impact, sans-serif; font-size:11px; letter-spacing:0; line-height:1;
+    color:var(--bg); background:var(--pink-hi); box-shadow:0 0 10px rgba(233,71,128,.8)}
+  .hecho .num{background:var(--cyan-hi); box-shadow:0 0 10px rgba(43,184,209,.8)}
+
+  .btn{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:52px;
+    border:0; border-radius:14px; cursor:pointer; text-decoration:none;
+    font-family:Boldonse, Impact, sans-serif; font-size:13px; line-height:1.45; letter-spacing:.08em;
+    color:var(--bg); background:var(--pink-hi);
+    box-shadow:0 0 16px rgba(233,71,128,.7); transition:transform .15s, filter .15s}
+  .btn:active{transform:scale(.98)}
+  .btn:disabled{filter:grayscale(1) brightness(.6); cursor:default; box-shadow:none}
+  .btn.cyan{background:var(--cyan-hi); box-shadow:0 0 16px rgba(43,184,209,.7)}
+  .btn svg{width:18px; height:18px; flex:none}
+
+  .gbtn{display:flex; justify-content:center; min-height:44px}
+  .bloq .gbtn, .bloq .otro{pointer-events:none}
+  .otro{display:block; margin:12px auto 0; background:none; border:0; cursor:pointer;
+    font:500 13px Inter, system-ui, sans-serif; color:var(--soft); text-decoration:underline; text-underline-offset:3px}
+  form{display:flex; flex-direction:column; gap:10px}
+  .sugerido{align-self:flex-start; background:none; border:0; cursor:pointer; padding:0 2px;
+    font:500 13.5px Inter, system-ui, sans-serif; color:#ffd28a; text-align:left}
+  .sugerido b{text-decoration:underline; text-underline-offset:3px}
+  .nota{font-size:12px; line-height:1.5; color:var(--muted); text-align:center}
+  input[type=email]{width:100%; min-height:52px; border-radius:14px; padding:0 16px;
+    font:500 16px Inter, system-ui, sans-serif; color:var(--ink); background:rgba(0,0,0,.35);
+    border:1.5px solid rgba(255,255,255,.18); outline:none; transition:border-color .2s, box-shadow .2s}
+  input[type=email]:focus{border-color:var(--cyan); box-shadow:0 0 12px rgba(43,184,209,.45)}
+  input[type=email]::placeholder{color:var(--muted)}
+  .trampa{position:absolute; left:-9999px; width:1px; height:1px; opacity:0}
+
+  .msg{margin-top:12px; padding:12px 14px; border-radius:12px; font-size:14px; line-height:1.5}
+  .msg b{color:var(--ink)}
+  .msg.ok{background:rgba(43,184,209,.12); border:1px solid rgba(43,184,209,.5); color:var(--cyan-hi)}
+  .msg.aviso{background:rgba(255,210,138,.1); border:1px solid rgba(255,210,138,.45); color:#ffd28a}
+  .msg.error{background:rgba(255,138,138,.1); border:1px solid rgba(255,138,138,.45); color:#ff8a8a}
+
+  .legal{margin-top:auto; padding-top:16px; text-align:center; font-size:12px; line-height:1.55; color:var(--muted)}
+
+  .spin{width:16px; height:16px; border-radius:50%; border:2px solid rgba(18,18,16,.3); border-top-color:var(--bg);
+    animation:girar .7s linear infinite}
+  @keyframes girar{to{transform:rotate(360deg)}}
+  @keyframes flicker{0%,18%,22%,62%,64%,100%{opacity:1} 20%{opacity:.55} 63%{opacity:.75}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+  @media (min-width:700px){ .frame-in{min-height:auto} .wrap{align-items:center} }
+</style>
+</head>
+<body>
+<div class="sky"></div><div class="floor"></div>
+<main class="wrap">
+  <div class="frame"><div class="frame-in">
+    <div class="tag">Vice Burgers &amp; Fries</div>
+    <img class="logo" src="../logo.png" alt="Vice">
+
+    <div class="intro">
+      <div class="off">10%<small>OFF</small></div>
+      <h1>en tu próxima visita</h1>
+      <p>Contanos en Google qué te pareció Vice y te mandamos un cupón a tu mail.</p>
+    </div>
+
+    <section class="paso" id="p1">
+      <div class="paso-t"><span class="num">1</span>Dejá tu reseña</div>
+      <a class="btn" id="irResena" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+        Reseñar en Google
+      </a>
+    </section>
+
+    <section class="paso bloq" id="p2">
+      <div class="paso-t"><span class="num">2</span>Recibí tu cupón</div>
+      <div id="gzona" hidden>
+        <div class="gbtn" id="gbtn"></div>
+        <button class="otro" id="otro" type="button">Prefiero escribir mi mail</button>
+      </div>
+      <form id="form" novalidate>
+        <input type="email" id="email" name="email" placeholder="tu@mail.com" autocomplete="email" inputmode="email" required disabled>
+        <input class="trampa" type="text" id="web" name="web" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="sugerido" id="sugerido" type="button" hidden></button>
+        <button class="btn cyan" id="enviar" type="submit" disabled>Mandame el cupón</button>
+        <p class="nota">El código llega solo a tu mail, no se muestra acá. Revisá que esté bien escrito.</p>
+      </form>
+      <div class="msg" id="msg" role="status" hidden></div>
+    </section>
+
+    <p class="legal">Un cupón por persona y por mail. Válido por 30 días en el local, presentando el código al pagar. No acumulable con otras promos. <a href="privacidad.html" style="color:inherit">Privacidad</a></p>
+  </div></div>
+</main>
+
+<script>
+(function(){
+  var CFG = window.CUPON_CFG || {};
+  var demo = !CFG.servidor || /[?&]demo\b/.test(location.search);
+  var $ = function(id){ return document.getElementById(id); };
+  var p1 = $('p1'), p2 = $('p2'), email = $('email'), enviar = $('enviar'), msg = $('msg');
+  var LS = 'vice:cupon';
+
+  function leer(){ try { return JSON.parse(localStorage.getItem(LS)) || {}; } catch(e){ return {}; } }
+  function guardar(o){ try { localStorage.setItem(LS, JSON.stringify(o)); } catch(e){} }
+
+  $('irResena').href = CFG.resena || 'https://www.google.com/maps/search/Vice+Burgers+%26+Fries';
+
+  function habilitar(){
+    p1.classList.add('hecho');
+    p2.classList.remove('bloq');
+    email.disabled = false; enviar.disabled = false;
+  }
+
+  var estado = leer();
+  if (estado.resena) habilitar();
+  if (estado.enviado) mostrar('ok', 'Ya te mandamos el cupón a <b>' + esc(estado.enviado) + '</b>. Si no lo ves, fijate en Promociones o Spam.');
+
+  $('irResena').addEventListener('click', function(){
+    var s = leer(); s.resena = Date.now(); guardar(s);
+    // Se habilita al volver a esta pestaña, así primero reseñan.
+    setTimeout(habilitar, 1500);
+  });
+
+  // Con ID de cliente: botón "Continuar con Google" y el mail escrito queda como alternativa.
+  var form = $('form');
+  if (CFG.googleClientId) {
+    $('gzona').hidden = false;
+    form.hidden = true;
+    $('otro').addEventListener('click', function(){
+      form.hidden = false; $('otro').hidden = true; email.focus();
+    });
+    iniciarGoogle();
+  }
+
+  function iniciarGoogle(){
+    if (!window.google || !google.accounts) return setTimeout(iniciarGoogle, 200);
+    google.accounts.id.initialize({ client_id: CFG.googleClientId, callback: conGoogle, auto_select: false, ux_mode: 'popup' });
+    google.accounts.id.renderButton($('gbtn'), {
+      theme: 'filled_black', size: 'large', shape: 'pill', text: 'continue_with', locale: 'es',
+      width: Math.min(360, $('gbtn').clientWidth || 300)
+    });
+  }
+
+  function conGoogle(resp){
+    var mail = '';
+    try { mail = JSON.parse(atob(resp.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).email; } catch(e){}
+    pedirCupon({ credential: resp.credential }, mail);
+  }
+
+  // "gmial.com" → "¿Quisiste decir gmail.com?"
+  var TYPOS = {
+    'gmail.com': ['gmial.com','gmai.com','gmail.co','gmail.con','gmail.cm','gmal.com','gmaill.com','gnail.com','gmail.om','gamil.com','gmail.comm','gmail.es','gmail.com.ar','gmil.com'],
+    'hotmail.com': ['hotmial.com','hotmai.com','hotmail.co','hotmail.con','hotmal.com','hotmil.com','homail.com','hotmaill.com','hotmail.cm'],
+    'outlook.com': ['outlok.com','outlook.co','outlook.con','outllok.com','otlook.com'],
+    'yahoo.com': ['yaho.com','yahoo.co','yahoo.con','yhoo.com'],
+    'icloud.com': ['iclod.com','icloud.co','icloud.con','icoud.com']
+  };
+  var sugerido = $('sugerido');
+  function revisarTypo(){
+    var v = email.value.trim(), at = v.lastIndexOf('@');
+    sugerido.hidden = true;
+    if (at < 1) return;
+    var dom = v.slice(at + 1).toLowerCase();
+    for (var bueno in TYPOS) {
+      if (TYPOS[bueno].indexOf(dom) >= 0) {
+        var arreglado = v.slice(0, at + 1) + bueno;
+        sugerido.innerHTML = '¿Quisiste decir <b>' + esc(arreglado) + '</b>?';
+        sugerido.onclick = function(){ email.value = arreglado; sugerido.hidden = true; msg.hidden = true; email.focus(); };
+        sugerido.hidden = false;
+        return;
+      }
+    }
+  }
+  email.addEventListener('input', revisarTypo);
+  email.addEventListener('blur', revisarTypo);
+
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var valor = email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor)) {
+      mostrar('error', 'Revisá el mail, parece que le falta algo.');
+      email.focus(); return;
+    }
+    if (!sugerido.hidden) {  // primero que corrija el typo
+      mostrar('aviso', 'Revisá el mail antes de mandarlo: tocá la sugerencia de arriba para corregirlo.');
+      return;
+    }
+    pedirCupon({ email: valor, web: $('web').value }, valor);
+  });
+
+  function pedirCupon(datos, valor){
+    cargando(true);
+    pedir(datos)
+      .then(function(r){
+        if (r.email) valor = r.email;
+        if (r.ok) {
+          var s = leer(); s.enviado = valor; guardar(s);
+          mostrar('ok', '¡Listo! Te mandamos el cupón a <b>' + esc(valor) + '</b>. Si no lo ves en unos minutos, fijate en Promociones o Spam.');
+          email.value = '';
+        } else if (r.motivo === 'google') {
+          mostrar('error', 'No pudimos confirmar tu cuenta de Google. Probá de nuevo o escribí tu mail.');
+        } else if (r.motivo === 'ya') {
+          mostrar('aviso', 'Este mail ya recibió su cupón. Es uno por persona.');
+        } else if (r.motivo === 'descartable') {
+          mostrar('error', 'Los mails temporales no valen para el cupón. Usá tu mail de siempre.');
+        } else if (r.motivo === 'dominio') {
+          mostrar('error', 'Ese mail no existe: lo que va después del @ no recibe correos. Revisalo.');
+        } else if (r.motivo === 'mail') {
+          mostrar('error', 'Ese mail no parece válido. Revisalo y probá de nuevo.');
+        } else {
+          mostrar('error', 'No pudimos mandarlo ahora. Probá de nuevo en un rato.');
+        }
+      })
+      .catch(function(){ mostrar('error', 'Se cortó la conexión. Probá de nuevo.'); })
+      .then(function(){ cargando(false); });
+  }
+
+  function pedir(datos){
+    if (demo) return demoPedir(datos);
+    // text/plain evita el preflight de CORS con Apps Script
+    return fetch(CFG.servidor, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(datos) })
+      .then(function(r){ return r.json(); });
+  }
+
+  // Modo prueba: sin servidor, recuerda los mails en este navegador.
+  function demoPedir(d){
+    return new Promise(function(ok){
+      setTimeout(function(){
+        var k = 'vice:cupon:demo', lista;
+        try { lista = JSON.parse(localStorage.getItem(k)) || []; } catch(e){ lista = []; }
+        // misma regla que normalizar_ en Code.gs
+        var crudo = d.email || JSON.parse(atob(d.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).email;
+        var p = crudo.trim().toLowerCase().split('@'), u = p[0].split('+')[0], dom = p[1];
+        if (dom === 'googlemail.com') dom = 'gmail.com';
+        if (dom === 'gmail.com') u = u.replace(/\./g, '');
+        var n = u + '@' + dom;
+        if (lista.indexOf(n) >= 0) return ok({ ok:false, motivo:'ya' });
+        lista.push(n);
+        try { localStorage.setItem(k, JSON.stringify(lista)); } catch(e){}
+        ok({ ok:true });
+      }, 700);
+    });
+  }
+
+  function cargando(si){
+    enviar.disabled = si;
+    $('gbtn').style.opacity = si ? '.4' : '';
+    $('gbtn').style.pointerEvents = si ? 'none' : '';
+    enviar.innerHTML = si ? '<span class="spin"></span>Enviando' : 'Mandame el cupón';
+  }
+  function mostrar(tipo, html){ msg.className = 'msg ' + tipo; msg.innerHTML = html; msg.hidden = false; }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+})();
+</script>
+</body>
+</html>
